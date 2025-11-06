@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { db } from "../../../../configs/firebaseConfig";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 
