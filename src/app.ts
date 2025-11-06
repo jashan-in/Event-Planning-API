@@ -1,7 +1,8 @@
 import express, { Application, Request, Response } from "express";
-import morgan from "morgan";
+import dotenv from "dotenv"; 
+import morgan from "morgan"; 
 
-
+dotenv.config();
 
 const app: Application = express();
 
