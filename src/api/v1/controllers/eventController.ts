@@ -23,6 +23,26 @@ export const getAllEvents = async (
 };
 
 /**
+ * Retrieves a single event by ID.
+ */
+export const getEventById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const event: Event = await eventService.getEventById(id);
+
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(event, "Event retrieved successfully")
+        );
+    } catch (error: unknown) {
+        next(error);
+    }
+};
+
+/**
  * Creates a new event.
  */
 export const createEvent = async (

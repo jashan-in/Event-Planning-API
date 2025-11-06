@@ -55,6 +55,13 @@ export const createEvent = async (eventData: {
         updatedAt: dateNow,
     };
 
+    // Remove undefined values 
+    Object.keys(newEvent).forEach(
+        (key) =>
+            newEvent[key as keyof Event] === undefined &&
+            delete newEvent[key as keyof Event]
+    );
+
     const eventId: string = await createDocument<Event>(COLLECTION, newEvent);
     return structuredClone({ id: eventId, ...newEvent } as Event);
 };
@@ -68,7 +75,7 @@ export const createEvent = async (eventData: {
 export const getEventById = async (id: string): Promise<Event> => {
     const doc: DocumentSnapshot | null = await getDocumentById(COLLECTION, id);
 
-    if (!doc) {
+    if (!doc || !doc.exists) {
         throw new Error(`Event with ID ${id} not found`);
     }
 
