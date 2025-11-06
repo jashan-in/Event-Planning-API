@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from "express";
 import dotenv from "dotenv"; 
 import morgan from "morgan"; 
+import eventRoutes from "./api/v1/routes/eventRoutes";
 
 dotenv.config();
 
@@ -15,4 +16,6 @@ app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Event Planning API is running..." });
 });
 
+// Routes
+app.use("/api/v1/events", eventRoutes);
 export default app;
