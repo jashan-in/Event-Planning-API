@@ -28,9 +28,7 @@ describe("Attendee Routes", () => {
     const mockEventId = "mockEvent123";
     const mockAttendeeId = "mockAttendee456";
 
-    // -------------------------
     // GET /api/v1/events/:id/attendees
-    // -------------------------
     describe("GET /api/v1/events/:id/attendees", () => {
         it("should call getAllAttendees controller", async () => {
             await request(app).get(`/api/v1/events/${mockEventId}/attendees`);
@@ -38,9 +36,7 @@ describe("Attendee Routes", () => {
         });
     });
 
-    // -------------------------
     // POST /api/v1/events/:id/attendees
-    // -------------------------
     describe("POST /api/v1/events/:id/attendees", () => {
         it("should call addAttendee controller with valid data", async () => {
             const mockAttendee = {
@@ -66,9 +62,7 @@ describe("Attendee Routes", () => {
         });
     });
 
-    // -------------------------
     // DELETE /api/v1/events/:id/attendees/:attendeeId
-    // -------------------------
     describe("DELETE /api/v1/events/:id/attendees/:attendeeId", () => {
         it("should call deleteAttendee controller", async () => {
             await request(app).delete(
