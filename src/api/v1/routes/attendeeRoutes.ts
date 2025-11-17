@@ -5,20 +5,41 @@ import { attendeeSchemas } from "../validations/attendeeValidation";
 
 const router: Router = express.Router();
 
-// Get all attendees for a specific event
-router.get("/:id/attendees", attendeeController.getAllAttendees);
+/**
+ * @swagger
+ * tags:
+ *   name: Attendees
+ *   description: Manage event attendees
+ */
 
-// Add a new attendee to a specific event
+/**
+ * @swagger
+ * /api/v1/events/{id}/attendees:
+ *   get:
+ *     summary: Get all attendees for an event
+ *     tags: [Attendees]
+ *   post:
+ *     summary: Add an attendee to an event
+ *     tags: [Attendees]
+ */
+router.get("/:id/attendees", attendeeController.getAllAttendees);
 router.post(
   "/:id/attendees",
   validateRequest(attendeeSchemas.create),
   attendeeController.addAttendee
 );
 
-// Get a single attendee by ID for a specific event
+/**
+ * @swagger
+ * /api/v1/events/{id}/attendees/{attendeeId}:
+ *   get:
+ *     summary: Get a single attendee by ID
+ *     tags: [Attendees]
+ *   delete:
+ *     summary: Remove an attendee from an event
+ *     tags: [Attendees]
+ */
 router.get("/:id/attendees/:attendeeId", attendeeController.getAttendeeById);
-
-// Delete an attendee by ID for a specific event
 router.delete(
   "/:id/attendees/:attendeeId",
   validateRequest(attendeeSchemas.remove),
