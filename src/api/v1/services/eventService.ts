@@ -79,9 +79,16 @@ export const getEventById = async (id: string): Promise<Event> => {
         throw new Error(`Event with ID ${id} not found`);
     }
 
-    const data: DocumentData | undefined = doc.data();
-    return structuredClone({ id: doc.id, ...data } as Event);
+    const data: DocumentData = doc.data()!;
+
+    return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate(),
+        updatedAt: data.updatedAt?.toDate(),
+    } as Event;
 };
+
 
 /**
  * Updates an existing event in Firestore.
