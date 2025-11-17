@@ -6,6 +6,8 @@ import eventRoutes from "./api/v1/routes/eventRoutes";
 import attendeeRoutes from "./api/v1/routes/attendeeRoutes";
 import ticketRoutes from "./api/v1/routes/ticketRoutes";
 
+import setupSwagger from "../configs/swagger";
+
 dotenv.config();
 
 const app: Application = express();
@@ -18,6 +20,9 @@ app.use(morgan("dev"));
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Event Planning API is running..." });
 });
+
+// Swagger Documentation 
+setupSwagger(app);
 
 // Event CRUD routes
 app.use("/api/v1/events", eventRoutes);
