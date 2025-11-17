@@ -1,0 +1,88 @@
+import request from "supertest";
+import { Request, Response } from "express";
+import app from "../src/app";
+import * as eventController from "../src/api/v1/controllers/eventController";
+import { HTTP_STATUS } from "../src/constants/httpConstants";
+
+// Mock all controller methods
+jest.mock("../src/api/v1/controllers/eventController", () => ({
+    getAllEvents: jest.fn((_req: Request, res: Response) =>
+        res.status(HTTP_STATUS.OK).send()
+    ),
+    createEvent: jest.fn((_req: Request, res: Response) =>
+        res.status(HTTP_STATUS.CREATED).send()
+    ),
+    getEvent: jest.fn((_req: Request, res: Response) =>
+        res.status(HTTP_STATUS.OK).send()
+    ),
+    getEventById: jest.fn((_req, res) => 
+        res.status(200).send()),
+
+    updateEvent: jest.fn((_req: Request, res: Response) =>
+        res.status(HTTP_STATUS.OK).send()
+    ),
+    deleteEvent: jest.fn((_req: Request, res: Response) =>
+        res.status(HTTP_STATUS.OK).send()
+    ),
+}));
+
+describe("Event Routes", () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe("GET /api/v1/events", () => {
+        it("should call getAllEvents controller", async () => {
+            await request(app).get("/api/v1/events");
+            expect(eventController.getAllEvents).toHaveBeenCalled();
+        });
+    });
+
+    describe("POST /api/v1/events", () => {
+        it("should call createEvent controller with valid data", async () => {
+            const mockEvent = {
+                title: "Sample Event",
+                description: "Testing create route",
+                date: "2025-12-01T09:00:00Z",
+                location: "Winnipeg Convention Centre",
+            };
+
+            await request(app)
+                .post("/api/v1/events")
+                .send(mockEvent);
+
+            expect(eventController.createEvent).toHaveBeenCalled();
+        });
+    });
+
+    describe("GET /api/v1/events/:id", () => {
+    it("should call getAllEvents controller (temporary placeholder)", async () => {
+        await request(app).get("/api/v1/events/testId");
+        expect(eventController.getEventById).toHaveBeenCalled();
+    });
+});
+
+    describe("PUT /api/v1/events/:id", () => {
+        it("should call updateEvent controller with valid data", async () => {
+            const mockEvent = {
+                title: "Updated Event",
+                description: "Updated details",
+                date: "2026-01-10T09:00:00Z",
+                location: "Toronto Convention Centre",
+            };
+
+            await request(app)
+                .put("/api/v1/events/testId")
+                .send(mockEvent);
+
+            expect(eventController.updateEvent).toHaveBeenCalled();
+        });
+    });
+
+    describe("DELETE /api/v1/events/:id", () => {
+        it("should call deleteEvent controller", async () => {
+            await request(app).delete("/api/v1/events/testId");
+            expect(eventController.deleteEvent).toHaveBeenCalled();
+        });
+    });
+});

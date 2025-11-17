@@ -1,0 +1,56 @@
+{
+  "name": "event-planning-api",
+  "version": "1.0.0",
+  "description": "Capstone Project - Event Planning API built with Node.js, TypeScript, Express, and Firebase.",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/server.ts",
+    "build": "tsc",
+    "dev": "nodemon src/server.ts",
+    "test": "jest --coverage",
+    "generate-docs": "ts-node scripts/generate-openapi.ts && npx @redocly/cli build-docs openapi.json --output docs/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jashan-in/Event-Planning-API.git"
+  },
+  "keywords": [],
+  "author": "Jashanpreet Singh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jashan-in/Event-Planning-API/issues"
+  },
+  "homepage": "https://github.com/jashan-in/Event-Planning-API#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "firebase": "^12.5.0",
+    "firebase-admin": "^13.6.0",
+    "helmet": "^8.1.0",
+    "joi": "^18.0.1",
+    "morgan": "^1.10.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^2.7.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/jest": "^30.0.0",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.10.0",
+    "@types/supertest": "^6.0.3",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@typescript-eslint/eslint-plugin": "^8.46.3",
+    "@typescript-eslint/parser": "^8.46.3",
+    "eslint": "^9.39.1",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
