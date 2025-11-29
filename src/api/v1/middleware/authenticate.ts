@@ -28,7 +28,7 @@ const authenticate = async (
 
         const decoded: DecodedIdToken = await auth.verifyIdToken(token);
 
-        // Store user info globally in locals (same as instructor)
+        // Store user info globally in locals
         res.locals.uid = decoded.uid;
         res.locals.role = decoded.role;
 
