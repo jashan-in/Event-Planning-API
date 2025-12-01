@@ -4,6 +4,10 @@ import app from "../src/app";
 import * as attendeeController from "../src/api/v1/controllers/attendeeController";
 import { HTTP_STATUS } from "../src/constants/httpConstants";
 
+// Mock authenticate + authorize
+jest.mock("../src/api/v1/middleware/authenticate", () => jest.fn((_req, _res, next) => next()));
+jest.mock("../src/api/v1/middleware/authorize", () => () => jest.fn((_req, _res, next) => next()));
+
 // Mock all attendee controller methods
 jest.mock("../src/api/v1/controllers/attendeeController", () => ({
     getAllAttendees: jest.fn((_req: Request, res: Response) =>
@@ -21,6 +25,7 @@ jest.mock("../src/api/v1/controllers/attendeeController", () => ({
 }));
 
 describe("Attendee Routes", () => {
+
     afterEach(() => {
         jest.clearAllMocks();
     });
@@ -38,7 +43,7 @@ describe("Attendee Routes", () => {
 
     // POST /api/v1/events/:id/attendees
     describe("POST /api/v1/events/:id/attendees", () => {
-        it("should call addAttendee controller with valid data", async () => {
+        it("should call addAttendee controller", async () => {
             const mockAttendee = {
                 name: "Jashan",
                 email: "jashan@example.com",
