@@ -4,6 +4,15 @@ import app from "../src/app";
 import * as eventController from "../src/api/v1/controllers/eventController";
 import { HTTP_STATUS } from "../src/constants/httpConstants";
 
+//  Mock authenticate + authorize 
+jest.mock("../src/api/v1/middleware/authenticate", () =>
+    jest.fn((_req, _res, next) => next())
+);
+
+jest.mock("../src/api/v1/middleware/authorize", () =>
+    () => jest.fn((_req, _res, next) => next())
+);
+
 // Mock all controller methods
 jest.mock("../src/api/v1/controllers/eventController", () => ({
     getAllEvents: jest.fn((_req: Request, res: Response) =>
@@ -12,12 +21,9 @@ jest.mock("../src/api/v1/controllers/eventController", () => ({
     createEvent: jest.fn((_req: Request, res: Response) =>
         res.status(HTTP_STATUS.CREATED).send()
     ),
-    getEvent: jest.fn((_req: Request, res: Response) =>
+    getEventById: jest.fn((_req: Request, res: Response) =>
         res.status(HTTP_STATUS.OK).send()
     ),
-    getEventById: jest.fn((_req, res) => 
-        res.status(200).send()),
-
     updateEvent: jest.fn((_req: Request, res: Response) =>
         res.status(HTTP_STATUS.OK).send()
     ),
@@ -27,10 +33,12 @@ jest.mock("../src/api/v1/controllers/eventController", () => ({
 }));
 
 describe("Event Routes", () => {
+
     afterEach(() => {
         jest.clearAllMocks();
     });
 
+    // GET /api/v1/events
     describe("GET /api/v1/events", () => {
         it("should call getAllEvents controller", async () => {
             await request(app).get("/api/v1/events");
@@ -38,6 +46,7 @@ describe("Event Routes", () => {
         });
     });
 
+    // POST /api/v1/events
     describe("POST /api/v1/events", () => {
         it("should call createEvent controller with valid data", async () => {
             const mockEvent = {
@@ -55,13 +64,15 @@ describe("Event Routes", () => {
         });
     });
 
+    // GET /api/v1/events/:id
     describe("GET /api/v1/events/:id", () => {
-    it("should call getAllEvents controller (temporary placeholder)", async () => {
-        await request(app).get("/api/v1/events/testId");
-        expect(eventController.getEventById).toHaveBeenCalled();
+        it("should call getEventById controller", async () => {
+            await request(app).get("/api/v1/events/testId");
+            expect(eventController.getEventById).toHaveBeenCalled();
+        });
     });
-});
 
+    // PUT /api/v1/events/:id
     describe("PUT /api/v1/events/:id", () => {
         it("should call updateEvent controller with valid data", async () => {
             const mockEvent = {
@@ -79,6 +90,7 @@ describe("Event Routes", () => {
         });
     });
 
+    // DELETE /api/v1/events/:id
     describe("DELETE /api/v1/events/:id", () => {
         it("should call deleteEvent controller", async () => {
             await request(app).delete("/api/v1/events/testId");
