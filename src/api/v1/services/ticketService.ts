@@ -1,15 +1,15 @@
 import {
-  QuerySnapshot,
-  DocumentData,
-  DocumentSnapshot,
+    QuerySnapshot,
+    DocumentData,
+    DocumentSnapshot,
 } from "firebase-admin/firestore";
 
 import {
-  createDocument,
-  getDocuments,
-  getDocumentById,
-  updateDocument,
-  deleteDocument,
+    createDocument,
+    getDocuments,
+    getDocumentById,
+    updateDocument,
+    deleteDocument,
 } from "../repositories/firestoreRepository";
 
 import { Ticket } from "../models/ticketModel";
@@ -20,96 +20,115 @@ const COLLECTION = "tickets";
 
 /**
  * Retrieves all tickets from Firestore.
+ *
+ * @returns Promise resolving to an array of Ticket objects
  */
 export const getAllTickets = async (): Promise<Ticket[]> => {
-  const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
+    const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
 
-  return snapshot.docs.map((doc) => {
-    const data: DocumentData = doc.data()!;
-    return {
-      id: doc.id,
-      ...data,
-      createdAt: data.createdAt?.toDate(),
-      updatedAt: data.updatedAt?.toDate(),
-    } as Ticket;
-  });
+    return snapshot.docs.map((doc) => {
+        const data: DocumentData = doc.data()!;
+        return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate(),
+            updatedAt: data.updatedAt?.toDate(),
+        } as Ticket;
+    });
 };
 
 /**
- * Retrieves a ticket by ID.
+ * Retrieves a single ticket by ID.
+ *
+ * @param id - The Firestore document ID of the ticket
+ * @returns Promise resolving to a Ticket object
+ * @throws Error if the ticket is not found
  */
 export const getTicketById = async (id: string): Promise<Ticket> => {
-  const doc: DocumentSnapshot | null = await getDocumentById(COLLECTION, id);
+    const doc: DocumentSnapshot | null = await getDocumentById(COLLECTION, id);
 
-  if (!doc || !doc.exists) {
-    throw new Error(`Ticket with ID ${id} not found`);
-  }
+    if (!doc || !doc.exists) {
+        throw new Error(`Ticket with ID ${id} not found`);
+    }
 
-  const data = doc.data()!;
-  return {
-    id: doc.id,
-    ...data,
-    createdAt: data.createdAt?.toDate(),
-    updatedAt: data.updatedAt?.toDate(),
-  } as Ticket;
+    const data: DocumentData = doc.data()!;
+    return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate(),
+        updatedAt: data.updatedAt?.toDate(),
+    } as Ticket;
 };
 
 /**
- * Create a new ticket (requires attendee + event validation).
+ * Creates a new ticket.
+ *
+ * Validates:
+ * - Event exists
+ * - Attendee belongs to that event
+ *
+ * @param ticketData - Ticket creation payload
+ * @returns Promise resolving to the newly created Ticket
  */
 export const createTicket = async (ticketData: {
-  eventId: string;
-  attendeeId: string;
-  type: string;
-  price: number;
-  status: "purchased" | "reserved" | "cancelled";
+    eventId: string;
+    attendeeId: string;
+    type: string;
+    price: number;
+    status: "purchased" | "reserved" | "cancelled";
 }): Promise<Ticket> => {
+    // Validate event existence
+    await getEventById(ticketData.eventId);
 
-  // 1️⃣ Ensure event exists
-  await getEventById(ticketData.eventId);
+    // Validate attendee belongs to this event
+    await getAttendeeById(ticketData.eventId, ticketData.attendeeId);
 
-  // 2️⃣ Ensure attendee belongs to the event
-  await getAttendeeById(ticketData.eventId, ticketData.attendeeId);
+    const now: Date = new Date();
 
-  const now = new Date();
+    const newTicket: Partial<Ticket> = {
+        ...ticketData,
+        createdAt: now,
+        updatedAt: now,
+    };
 
-  const newTicket: Partial<Ticket> = {
-    ...ticketData,
-    createdAt: now,
-    updatedAt: now,
-  };
+    const ticketId: string = await createDocument(COLLECTION, newTicket);
 
-  const ticketId: string = await createDocument(COLLECTION, newTicket);
-
-  return {
-    id: ticketId,
-    ...newTicket,
-  } as Ticket;
+    return {
+        id: ticketId,
+        ...newTicket,
+    } as Ticket;
 };
 
 /**
- * Updates a ticket.
+ * Updates a ticket by ID.
+ *
+ * @param id - Ticket document ID
+ * @param data - Partial update payload for the Ticket
+ * @returns Promise resolving to the updated Ticket
  */
 export const updateTicket = async (
-  id: string,
-  data: Partial<Ticket>
+    id: string,
+    data: Partial<Ticket>
 ): Promise<Ticket> => {
-  const existing = await getTicketById(id);
+    const existing: Ticket = await getTicketById(id);
 
-  const updated: Ticket = {
-    ...existing,
-    ...data,
-    updatedAt: new Date(),
-  };
+    const updated: Ticket = {
+        ...existing,
+        ...data,
+        updatedAt: new Date(),
+    };
 
-  await updateDocument(COLLECTION, id, updated);
-  return updated;
+    await updateDocument(COLLECTION, id, updated);
+    return updated;
 };
 
 /**
- * Deletes a ticket.
+ * Deletes a ticket by ID.
+ *
+ * @param id - Ticket document ID
+ * @returns Promise<void>
  */
 export const deleteTicket = async (id: string): Promise<void> => {
-  await getTicketById(id); // ensure exists
-  await deleteDocument(COLLECTION, id);
+    await getTicketById(id); // ensure exists
+    await deleteDocument(COLLECTION, id);
 };

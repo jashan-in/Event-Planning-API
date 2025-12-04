@@ -6,6 +6,11 @@ import { successResponse } from "../models/responseModel";
 
 /**
  * Retrieves all attendees for a specific event.
+ *
+ * @param req - Express request object containing `eventId` in params.
+ * @param res - Express response object.
+ * @param next - Express next middleware function.
+ * @returns Promise<void>
  */
 export const getAllAttendees = async (
     req: Request,
@@ -26,6 +31,11 @@ export const getAllAttendees = async (
 
 /**
  * Adds a new attendee to a specific event.
+ *
+ * @param req - Express request containing attendee data in body and `eventId` in params.
+ * @param res - Express response object.
+ * @param next - Express next middleware function.
+ * @returns Promise<void>
  */
 export const addAttendee = async (
     req: Request,
@@ -50,7 +60,12 @@ export const addAttendee = async (
 };
 
 /**
- * Retrieves a single attendee by ID for a specific event.
+ * Retrieves a single attendee by attendeeId for a specific event.
+ *
+ * @param req - Express request containing `eventId` and `attendeeId` in params.
+ * @param res - Express response object.
+ * @param next - Express next middleware function.
+ * @returns Promise<void>
  */
 export const getAttendeeById = async (
     req: Request,
@@ -70,7 +85,12 @@ export const getAttendeeById = async (
 };
 
 /**
- * Deletes an attendee by ID for a specific event.
+ * Deletes an attendee from a specific event.
+ *
+ * @param req - Express request containing `eventId` and `attendeeId` in params.
+ * @param res - Express response object.
+ * @param next - Express next middleware function.
+ * @returns Promise<void>
  */
 export const deleteAttendee = async (
     req: Request,
@@ -79,6 +99,7 @@ export const deleteAttendee = async (
 ): Promise<void> => {
     try {
         const { id: eventId, attendeeId } = req.params;
+
         await attendeeService.deleteAttendee(eventId, attendeeId);
 
         res.status(HTTP_STATUS.OK).json(

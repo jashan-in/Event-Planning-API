@@ -3,6 +3,7 @@ import {
     DocumentData,
     DocumentSnapshot,
 } from "firebase-admin/firestore";
+
 import {
     createDocument,
     getDocuments,
@@ -10,36 +11,35 @@ import {
     updateDocument,
     deleteDocument,
 } from "../repositories/firestoreRepository";
+
 import { Event } from "../models/eventModel";
 
-const COLLECTION: string = "events";
+const COLLECTION = "events";
 
 /**
  * Retrieves all events from Firestore.
- * @returns {Promise<Event[]>} List of all events.
+ *
+ * @returns Promise resolving to an array of Event objects
  */
 export const getAllEvents = async (): Promise<Event[]> => {
-    try {
-        const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
-        const events: Event[] = snapshot.docs.map((doc) => {
-            const data: DocumentData = doc.data();
-            return {
-                id: doc.id,
-                ...data,
-                createdAt: data.createdAt?.toDate(),
-                updatedAt: data.updatedAt?.toDate(),
-            } as Event;
-        });
-        return events;
-    } catch (error: unknown) {
-        throw error;
-    }
+    const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
+
+    return snapshot.docs.map((doc) => {
+        const data: DocumentData = doc.data();
+        return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate?.() || data.createdAt,
+            updatedAt: data.updatedAt?.toDate?.() || data.updatedAt,
+        } as Event;
+    });
 };
 
 /**
- * Creates a new event in Firestore.
- * @param eventData - The event details.
- * @returns {Promise<Event>} The created event.
+ * Creates a new event.
+ *
+ * @param eventData - Input object containing event details (title, date, location, description)
+ * @returns Promise resolving to the newly created Event
  */
 export const createEvent = async (eventData: {
     title: string;
@@ -47,30 +47,35 @@ export const createEvent = async (eventData: {
     location: string;
     description?: string;
 }): Promise<Event> => {
-    const dateNow = new Date();
+    const now = new Date();
 
     const newEvent: Partial<Event> = {
         ...eventData,
-        createdAt: dateNow,
-        updatedAt: dateNow,
+        createdAt: now,
+        updatedAt: now,
     };
 
-    // Remove undefined values 
-    Object.keys(newEvent).forEach(
-        (key) =>
-            newEvent[key as keyof Event] === undefined &&
-            delete newEvent[key as keyof Event]
-    );
+    // Remove undefined properties
+    Object.keys(newEvent).forEach((key) => {
+        if (newEvent[key as keyof Event] === undefined) {
+            delete newEvent[key as keyof Event];
+        }
+    });
 
-    const eventId: string = await createDocument<Event>(COLLECTION, newEvent);
-    return structuredClone({ id: eventId, ...newEvent } as Event);
+    const eventId: string = await createDocument(COLLECTION, newEvent);
+
+    return {
+        id: eventId,
+        ...newEvent,
+    } as Event;
 };
 
 /**
  * Retrieves a single event by its Firestore document ID.
- * @param id - The event document ID.
- * @returns {Promise<Event>} The retrieved event.
- * @throws {Error} If the event is not found.
+ *
+ * @param id - The Firestore document ID of the event
+ * @returns Promise resolving to the Event
+ * @throws Error if the event is not found
  */
 export const getEventById = async (id: string): Promise<Event> => {
     const doc: DocumentSnapshot | null = await getDocumentById(COLLECTION, id);
@@ -84,26 +89,23 @@ export const getEventById = async (id: string): Promise<Event> => {
     return {
         id: doc.id,
         ...data,
-        createdAt: data.createdAt?.toDate(),
-        updatedAt: data.updatedAt?.toDate(),
+        createdAt: data.createdAt?.toDate?.() || data.createdAt,
+        updatedAt: data.updatedAt?.toDate?.() || data.updatedAt,
     } as Event;
 };
 
-
 /**
- * Updates an existing event in Firestore.
- * @param id - The event document ID.
- * @param eventData - The updated event data.
- * @returns {Promise<Event>} The updated event.
+ * Updates an existing event.
+ *
+ * @param id - The event document ID
+ * @param eventData - Partial event data to update
+ * @returns Promise resolving to the updated Event
  */
 export const updateEvent = async (
     id: string,
     eventData: Partial<Event>
 ): Promise<Event> => {
-    const existingEvent: Event = await getEventById(id);
-    if (!existingEvent) {
-        throw new Error(`Event with ID ${id} not found`);
-    }
+    const existingEvent = await getEventById(id);
 
     const updatedEvent: Event = {
         ...existingEvent,
@@ -111,20 +113,18 @@ export const updateEvent = async (
         updatedAt: new Date(),
     };
 
-    await updateDocument<Event>(COLLECTION, id, updatedEvent);
-    return structuredClone(updatedEvent);
+    await updateDocument(COLLECTION, id, updatedEvent);
+
+    return updatedEvent;
 };
 
 /**
- * Deletes an event by its Firestore document ID.
- * @param id - The event document ID.
- * @returns {Promise<void>}
+ * Deletes an event by ID.
+ *
+ * @param id - The event document ID
+ * @returns Promise<void>
  */
 export const deleteEvent = async (id: string): Promise<void> => {
-    const event: Event = await getEventById(id);
-    if (!event) {
-        throw new Error(`Event with ID ${id} not found`);
-    }
-
+    await getEventById(id);
     await deleteDocument(COLLECTION, id);
 };

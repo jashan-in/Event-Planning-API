@@ -6,6 +6,11 @@ import { successResponse } from "../models/responseModel";
 
 /**
  * Retrieves all events.
+ *
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware
+ * @returns Promise<void>
  */
 export const getAllEvents = async (
     req: Request,
@@ -14,6 +19,7 @@ export const getAllEvents = async (
 ): Promise<void> => {
     try {
         const events: Event[] = await eventService.getAllEvents();
+
         res.status(HTTP_STATUS.OK).json(
             successResponse(events, "Events retrieved successfully")
         );
@@ -23,7 +29,12 @@ export const getAllEvents = async (
 };
 
 /**
- * Retrieves a single event by ID.
+ * Retrieves a single event by its ID.
+ *
+ * @param req - Express request containing `id` in params
+ * @param res - Express response object
+ * @param next - Express next middleware
+ * @returns Promise<void>
  */
 export const getEventById = async (
     req: Request,
@@ -44,6 +55,11 @@ export const getEventById = async (
 
 /**
  * Creates a new event.
+ *
+ * @param req - Express request containing event data in body
+ * @param res - Express response object
+ * @param next - Express next middleware
+ * @returns Promise<void>
  */
 export const createEvent = async (
     req: Request,
@@ -69,7 +85,12 @@ export const createEvent = async (
 };
 
 /**
- * Updates an existing event by ID.
+ * Updates an existing event by its ID.
+ *
+ * @param req - Express request containing `id` in params and updated fields in body
+ * @param res - Express response object
+ * @param next - Express next middleware
+ * @returns Promise<void>
  */
 export const updateEvent = async (
     req: Request,
@@ -96,7 +117,12 @@ export const updateEvent = async (
 };
 
 /**
- * Deletes an event by ID.
+ * Deletes an event by its ID.
+ *
+ * @param req - Express request containing `id` in params
+ * @param res - Express response object
+ * @param next - Express next middleware
+ * @returns Promise<void>
  */
 export const deleteEvent = async (
     req: Request,
@@ -105,7 +131,9 @@ export const deleteEvent = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
+
         await eventService.deleteEvent(id);
+
         res.status(HTTP_STATUS.OK).json(
             successResponse({}, "Event deleted successfully")
         );
