@@ -4,6 +4,9 @@ dotenv.config();
 import express, { Application, Request, Response } from "express";
 import morgan from "morgan";
 
+import { getHelmetConfig } from "../configs/helmetConfig";
+import { getCorsConfig } from "../configs/corsConfig";
+
 //Node Cron
 import "./api/v1/cron/cronJobs";
 
@@ -20,6 +23,14 @@ const app: Application = express();
 // Middleware
 app.use(express.json());
 app.use(morgan("dev"));
+
+
+// Security middleware 
+import helmet from "helmet";
+import cors from "cors";
+
+app.use(helmet(getHelmetConfig()));
+app.use(cors(getCorsConfig()));
 
 // Health Check Route
 app.get("/", (req: Request, res: Response) => {
