@@ -4,6 +4,15 @@ import app from "../src/app";
 import * as ticketController from "../src/api/v1/controllers/ticketController";
 import { HTTP_STATUS } from "../src/constants/httpConstants";
 
+// Mock authenticate + authorize 
+jest.mock("../src/api/v1/middleware/authenticate", () =>
+    jest.fn((_req, _res, next) => next())
+);
+
+jest.mock("../src/api/v1/middleware/authorize", () =>
+    () => jest.fn((_req, _res, next) => next())
+);
+
 // Mock ticket controller functions
 jest.mock("../src/api/v1/controllers/ticketController", () => ({
     getAllTickets: jest.fn((_req: Request, res: Response) =>
@@ -28,6 +37,7 @@ describe("Ticket Routes", () => {
         jest.clearAllMocks();
     });
 
+    // GET /api/v1/tickets
     describe("GET /api/v1/tickets", () => {
         it("should call getAllTickets controller", async () => {
             await request(app).get("/api/v1/tickets");
@@ -35,6 +45,7 @@ describe("Ticket Routes", () => {
         });
     });
 
+    // GET /api/v1/tickets/:id
     describe("GET /api/v1/tickets/:id", () => {
         it("should call getTicketById controller", async () => {
             await request(app).get("/api/v1/tickets/testTicketId");
@@ -42,6 +53,7 @@ describe("Ticket Routes", () => {
         });
     });
 
+    // POST /api/v1/tickets
     describe("POST /api/v1/tickets", () => {
         it("should call createTicket controller", async () => {
             const mockTicket = {
@@ -60,6 +72,7 @@ describe("Ticket Routes", () => {
         });
     });
 
+    // PUT /api/v1/tickets/:id
     describe("PUT /api/v1/tickets/:id", () => {
         it("should call updateTicket controller", async () => {
             const mockUpdates = {
@@ -75,6 +88,7 @@ describe("Ticket Routes", () => {
         });
     });
 
+    // DELETE /api/v1/tickets/:id
     describe("DELETE /api/v1/tickets/:id", () => {
         it("should call deleteTicket controller", async () => {
             await request(app).delete("/api/v1/tickets/testTicketId");
