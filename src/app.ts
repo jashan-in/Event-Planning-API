@@ -4,6 +4,9 @@ dotenv.config();
 import express, { Application, Request, Response } from "express";
 import morgan from "morgan";
 
+//Node Cron
+import "./api/v1/cron/cronJobs";
+
 // Routes
 import eventRoutes from "./api/v1/routes/eventRoutes";
 import attendeeRoutes from "./api/v1/routes/attendeeRoutes";
